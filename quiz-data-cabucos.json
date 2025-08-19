@@ -1,0 +1,90 @@
+{
+  "tests": [
+    {
+      "testName": "Identification Quiz – JavaScript & HTML Events",
+      "instructions": "Answer each question briefly in the space provided.",
+      "questions": [
+        {
+          "question": "In JavaScript, what is an example of an inline event where the function is written inside the HTML element?",
+          "answer": "<button onclick=\"myFunction()\">Click Me</button>"
+        },
+        {
+          "question": "What does the term inline event in JavaScript mean?",
+          "answer": "An event handler that is added directly within an HTML element’s attribute."
+        },
+        {
+          "question": "What method in JavaScript attaches an event handler to an element without overwriting existing ones?",
+          "answer": "addEventListener()"
+        },
+        {
+          "question": "What term describes delaying a function call until a certain time has passed since the last invocation?",
+          "answer": "Debouncing"
+        },
+        {
+          "question": "What technique ensures a function runs at most once every specified period?",
+          "answer": "Throttling"
+        },
+        {
+          "question": "What do we call a function passed into another function as an argument, executed later?",
+          "answer": "Callback function"
+        },
+        {
+          "question": "What is the main advantage of using Promises over callbacks?",
+          "answer": "They avoid callback hell and provide cleaner chaining for async operations."
+        },
+        {
+          "question": "Which keyword pauses execution of a function until a Promise resolves?",
+          "answer": "await"
+        },
+        {
+          "question": "What does document.querySelector(\"#myId\") return?",
+          "answer": "The first element that matches the CSS selector #myId."
+        },
+        {
+          "question": "Which JavaScript method is commonly used to make HTTP requests?",
+          "answer": "fetch()"
+        },
+        {
+          "question": "Which event attribute is triggered when a key is pressed down?",
+          "answer": "onkeydown"
+        },
+        {
+          "question": "Which event attribute is triggered when text in an input field changes?",
+          "answer": "onchange"
+        },
+        {
+          "question": "Which event attribute triggers when an element is double-clicked?",
+          "answer": "ondblclick"
+        },
+        {
+          "question": "Which event attribute triggers when a form is submitted?",
+          "answer": "onsubmit"
+        },
+        {
+          "question": "Which event attribute triggers when an element is dragged?",
+          "answer": "ondragstart"
+        },
+        {
+          "question": "Which event attribute triggers when a media file starts playing?",
+          "answer": "onplay"
+        },
+        {
+          "question": "Which event attribute triggers when a media file is paused?",
+          "answer": "onpause"
+        },
+        {
+          "question": "Which event attribute is triggered when a window is resized?",
+          "answer": "onresize"
+        },
+        {
+          "question": "Which event attribute is triggered when a page finishes loading?",
+          "answer": "onload"
+        },
+        {
+          "question": "Which event attribute is triggered when a touch interaction starts?",
+          "answer": "ontouchstart"
+        }
+      ]
+    }
+  ]
+}
