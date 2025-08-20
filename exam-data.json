@@ -1,7 +1,7 @@
 {
   "questions": [
     {
-      "question": "Which keyword describes an event written directly inside an HTML element attribute? (Answer: Inline Events)",
+      "question": "Which keyword describes an event written directly inside an HTML element attribute?",
       "answer": "Inline Events"
     },
     {
@@ -82,3 +82,4 @@
     }
   ]
 }
+
