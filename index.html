@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Driven Programming Exam</title>
+<style>
+  :root{--bg:#0f172a;--card:#111827;--accent:#38bdf8;--muted:#94a3b8;--ok:#22c55e;--bad:#ef4444;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,"Noto Sans";background:var(--bg);color:#e5e7eb}
+  header{padding:28px 16px;text-align:center;border-bottom:1px solid #1f2937;background:linear-gradient(180deg,rgba(56,189,248,.08),transparent)}
+  h1{margin:0 0 8px 0;font-size:clamp(22px,4vw,36px);letter-spacing:.2px}
+  p.sub{margin:0;color:var(--muted);font-size:clamp(14px,2.3vw,16px)}
+  main{max-width:900px;margin:24px auto;padding:16px}
+  .card{background:var(--card);border:1px solid #1f2937;border-radius:16px;padding:18px;margin:16px 0;box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}
+  .question{font-size:18px;margin:6px 0 14px 0;line-height:1.4;text-align:left}
+  input.answer{width:100%;padding:10px;border-radius:8px;border:1px solid #243041;background:#0b1220;color:#e5e7eb}
+  button{background:var(--accent);border:none;color:#05232e;padding:10px 20px;border-radius:10px;font-weight:600;cursor:pointer;margin-top:10px}
+  #hud{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0}
+  .pill{border:1px solid #1f2937;background:#0b1220;border-radius:999px;padding:6px 12px;font-size:13px;color:#cbd5e1}
+  #result{font-size:18px;margin-top:12px;text-align:center}
+  footer{color:var(--muted);text-align:center;padding:24px 12px}
+</style>
+</head>
+<body>
+<header>
+  <h1> Identification – Software Architecture, Design Principles & UML </h1>
+  <p class="sub">Answer each question with ONE word only and ALL CAPS!.</p>
+</header>
+<main>
+  <div id="hud">
+    <span class="pill" id="progress">Question 0/0</span>
+    <span class="pill" id="timer">Time: 10:00</span>
+  </div>
+  <div id="quiz"></div>
+  <div class="card">
+    <div class="question" id="result">Press START to begin the exam.</div>
+    <button id="startBtn">START EXAM</button>
+  </div>
+</main>
+<footer>Made for classroom use. Tip: Use it offline by saving this file.</footer>
+
+
+<script>
+// Prevent reload, inspect, right click, and shortcuts
+document.addEventListener("keydown", function(e){
+  // Disable reload
+  if(e.key==="F5" || (e.ctrlKey && e.key.toLowerCase()==="r")){
+    e.preventDefault();
+    alert("Reloading is disabled during the exam.");
+  }
+
+  // Disable inspect
+  if(e.key==="F12" || (e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="i")){
+    e.preventDefault();
+    alert("Inspect is disabled during the exam.");
+  }
+
+  // Disable console (Ctrl+Shift+J)
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="j"){
+    e.preventDefault();
+    alert("Console is disabled during the exam.");
+  }
+
+  // Disable copy, paste, cut, select all, save, view source
+  if(e.ctrlKey && ["c","v","x","a","s","u"].includes(e.key.toLowerCase())){
+    e.preventDefault();
+    alert("Shortcut is disabled during the exam.");
+  }
+});
+
+// Disable right click
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// Detect tab switching (focus lost)
+window.addEventListener("blur", () => {
+  alert("Warning: You switched tabs or minimized the exam window!");
+});
+
+let tabWarnings = 0;
+
+// Enable fullscreen on Start
+function goFullscreen() {
+  if (document.documentElement.requestFullscreen) {
+    document.documentElement.requestFullscreen();
+  } else if (document.documentElement.mozRequestFullScreen) { // Firefox
+    document.documentElement.mozRequestFullScreen();
+  } else if (document.documentElement.webkitRequestFullscreen) { // Chrome, Safari, Opera
+    document.documentElement.webkitRequestFullscreen();
+  } else if (document.documentElement.msRequestFullscreen) { // IE/Edge
+    document.documentElement.msRequestFullscreen();
+  }
+}
+
+// Detect tab switching
+window.addEventListener("blur", () => {
+  tabWarnings++;
+  if (tabWarnings === 1) {
+    alert("⚠ Warning: Do not switch tabs! Next attempt will end your exam.");
+  } else if (tabWarnings >= 2) {
+    document.body.style.background = "red"; 
+    finishExam(); // Auto-submit
+  }
+});
+
+
+let questions = [];
+let userAnswers = [];
+let score = 0;
+let current = 0;
+let timer;
+let remaining = 10*60;
+
+const quizDiv = document.getElementById("quiz");
+const progressEl = document.getElementById("progress");
+const timerEl = document.getElementById("timer");
+const resultEl = document.getElementById("result");
+const startBtn = document.getElementById("startBtn");
+
+function formatTime(s){
+  const m=Math.floor(s/60).toString().padStart(2,"0");
+  const sec=(s%60).toString().padStart(2,"0");
+  return m+":"+sec;
+}
+
+function startTimer(){
+  timer = setInterval(()=>{
+    remaining--;
+    timerEl.textContent="Time: "+formatTime(remaining);
+    if(remaining<=0){
+      clearInterval(timer);
+      finishExam();
+    }
+  },1000);
+}
+
+function shuffleArray(arr){
+  for(let i=arr.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function renderQuestion(index){
+  quizDiv.innerHTML="";
+  const q = questions[index];
+  progressEl.textContent=`Question ${index+1}/${questions.length}`;
+
+  const card=document.createElement("div");
+  card.className="card";
+  card.innerHTML=`<div class="question">${q.question}</div>
+                  <input type="text" class="answer" id="ansInput">
+                  <button id="submitBtn">Submit</button>`;
+  quizDiv.appendChild(card);
+
+  document.getElementById("submitBtn").addEventListener("click",()=>{
+    const ans = document.getElementById("ansInput").value.trim();
+    userAnswers[index]=ans || "-";
+    if(ans.toLowerCase() === q.answer.toLowerCase()) score++;
+    current++;
+    if(current<questions.length){
+      renderQuestion(current);
+    } else finishExam();
+  });
+}
+
+function finishExam(){
+  clearInterval(timer);
+  quizDiv.innerHTML="";
+  progressEl.textContent="Exam Completed";
+
+  let html=`<h2>Exam Results</h2>
+            <h3 style="color:var(--accent)">Final Score: ${score}/${questions.length}</h3>
+            <div id="countdownBox" style="margin-top:12px;font-size:16px;color:var(--muted)">
+              Record your score. Returning to start in 60s...
+            </div>`;
+  quizDiv.innerHTML = html;
+
+  // countdown box
+  let countdown = 60;
+  const cdEl = document.getElementById("countdownBox");
+  const interval = setInterval(()=>{
+    countdown--;
+    cdEl.textContent = `Record your score. Returning to start in ${countdown}s...`;
+    if(countdown<=0){
+      clearInterval(interval);
+      resetExam();
+    }
+  },1000);
+}
+
+function resetExam(){
+  quizDiv.innerHTML="";
+  resultEl.textContent="Press START to begin the exam.";
+  startBtn.style.display="inline-block";
+  progressEl.textContent="Question 0/0";
+  timerEl.textContent="Time: 10:00";
+  score=0; current=0; userAnswers=[]; remaining=10*60;
+}
+
+// Prevent reload & right click/inspect
+document.addEventListener("keydown", function(e){
+  if(e.key==="F5" || (e.ctrlKey && e.key==="r")){
+    e.preventDefault();
+    alert("Reloading is disabled during the exam.");
+  }
+  if(e.key==="F12" || (e.ctrlKey && e.shiftKey && (e.key==="I" || e.key==="i"))){
+    e.preventDefault();
+    alert("Inspect is disabled during the exam.");
+  }
+});
+document.addEventListener("contextmenu", e=>e.preventDefault());
+
+// Start button
+startBtn.addEventListener("click", ()=>{
+  goFullscreen(); // go fullscreen on start
+  startExam();
+  fetch("exam-data.json")
+    .then(res=>res.json())
+    .then(data=>{
+      questions = shuffleArray(data.questions);
+      current=0; score=0; userAnswers=[];
+      startBtn.style.display="none";
+      resultEl.textContent="Exam in progress...";
+      startTimer();
+      renderQuestion(0);
+    })
+    .catch(err=>{
+      console.error(err);
+      resultEl.textContent="Failed to load exam data.";
+    });
+});
+</script>
+</body>
+</html>
